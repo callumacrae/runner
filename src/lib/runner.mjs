@@ -14,6 +14,7 @@ export default class Runner extends EventEmitter {
     this.status = "starting";
 
     this.log = blessed.log({
+      hidden: true,
       width: "70%",
       height: "100%-1",
       left: "30%",

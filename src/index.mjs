@@ -28,13 +28,27 @@ const child = new Runner({
 
 screen.append(child.log);
 
+const child2 = new Runner({
+  name: "test 2",
+  cmd: path.join(__dirname, "test.sh"),
+  statusObject: {
+    "all good": "success",
+    warning: "warning",
+    error: "error",
+  },
+});
+
+screen.append(child2.log);
+
 const table = new RunnerTable();
-table.addRunner(child);
 screen.append(table);
+table.addRunner(child);
+table.addRunner(child2);
 
 table.focus()
 
 screen.key('h', () => table.focus());
+// @todo focus correct log
 screen.key('l', () => child.log.focus());
 
 const commandBar = new CommandBar();
