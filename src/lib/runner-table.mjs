@@ -32,6 +32,7 @@ export default class RunnerTable extends blessed.listtable {
 
     this.selected = 0;
     this._runners = [];
+    this.focusedRunner = undefined;
 
     this.key("j", () => {
       if (this.selected < this._runners.length - 1) {
@@ -45,12 +46,21 @@ export default class RunnerTable extends blessed.listtable {
         this._updateLog();
       }
     });
+
+    this.logContainer = blessed.box({
+      width: "70%",
+      height: "100%-1",
+      left: "30%",
+      top: 0
+    });
   }
 
   addRunner(runner) {
     this._runners.push(runner);
     this._renderRunnerTable();
     this._updateLog();
+
+    this.logContainer.append(runner.log);
 
     runner.on("status", () => this._renderRunnerTable());
   }
@@ -73,6 +83,7 @@ export default class RunnerTable extends blessed.listtable {
       const runner = this._runners[i];
       if (i === this.selected) {
         runner.log.show();
+        this.focusedRunner = runner;
       } else {
         runner.log.hide();
       }

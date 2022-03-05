@@ -15,10 +15,6 @@ export default class Runner extends EventEmitter {
 
     this.log = blessed.log({
       hidden: true,
-      width: "70%",
-      height: "100%-1",
-      left: "30%",
-      top: 0,
       border: "line",
       label: ` ${options.name} log `,
       scrollback: 1000,
