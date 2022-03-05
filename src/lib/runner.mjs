@@ -9,7 +9,8 @@ export default class Runner extends EventEmitter {
   constructor(options) {
     super();
 
-    this.cmd = options.cmd;
+    this.cwd = options.cwd;
+    this.command = options.command;
     this.name = options.name;
     this.status = "starting";
 
@@ -33,7 +34,7 @@ export default class Runner extends EventEmitter {
       },
     });
 
-    const child = spawn(this.cmd);
+    const child = spawn(this.command, { cwd: this.cwd });
     this._child = child;
 
     child.stdout.on("data", (data) => {

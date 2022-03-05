@@ -1,5 +1,6 @@
 import blessed from "blessed";
 
+import Runner from "./runner.mjs";
 import { statusToIcon } from "./status.mjs";
 
 export default class RunnerTable extends blessed.listtable {
@@ -51,7 +52,7 @@ export default class RunnerTable extends blessed.listtable {
       width: "70%",
       height: "100%-1",
       left: "30%",
-      top: 0
+      top: 0,
     });
   }
 
@@ -63,6 +64,17 @@ export default class RunnerTable extends blessed.listtable {
     this.logContainer.append(runner.log);
 
     runner.on("status", () => this._renderRunnerTable());
+  }
+
+  addRunnersArray(runners, options) {
+    runners.forEach((runnerConfig) => {
+      const runner = new Runner({
+        cwd: options.cwd,
+        ...runnerConfig,
+      });
+
+      this.addRunner(runner);
+    });
   }
 
   _renderRunnerTable() {

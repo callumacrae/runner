@@ -1,0 +1,22 @@
+{
+  "runners": [
+    {
+      "name": "test",
+      "command": "./test.sh",
+      "statusObject": {
+        "all good": "success",
+        "warning": "warning",
+        "error": "error"
+      }
+    },
+    {
+      "name": "test 2",
+      "command": "./test.sh",
+      "statusObject": {
+        "all good": "success",
+        "warning": "warning",
+        "error": "error"
+      }
+    }
+  ]
+}
