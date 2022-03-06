@@ -18,5 +18,8 @@
   "homepage": "https://github.com/callumacrae/runner#readme",
   "dependencies": {
     "blessed": "^0.1.81"
+  },
+  "bin": {
+    "runner": "./src/index.mjs"
   }
 }

@@ -1,7 +1,7 @@
 import blessed from "blessed";
 
 import Runner from "./runner.mjs";
-import { statusToIcon } from "./status.mjs";
+import { statusToBlessedIcon } from "./status.mjs";
 
 export default class RunnersInterface extends blessed.box {
   constructor() {
@@ -79,7 +79,14 @@ export default class RunnersInterface extends blessed.box {
     this.logContainer.append(runner.log);
     runner.log.key("h", () => this.table.focus());
 
-    runner.on("status", () => this._renderRunnersInterface());
+    runner.on("status", () => {
+      this._renderRunnersInterface();
+      this.emit('status', this.status());
+    });
+  }
+
+  status() {
+    return this._runners.map(runner => runner.status);
   }
 
   addRunnersArray(runners, options) {
@@ -105,7 +112,7 @@ export default class RunnersInterface extends blessed.box {
         this._runners.map((runner, i) => [
           this.selected === i ? `{bold}${i}*{/bold}` : i.toString(),
           runner.name,
-          statusToIcon(runner.status),
+          statusToBlessedIcon(runner.status),
         ])
       )
     );

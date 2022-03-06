@@ -9,8 +9,6 @@ export default class Runner extends EventEmitter {
   constructor(options) {
     super();
 
-    this.cwd = options.cwd;
-    this.command = options.command;
     this.name = options.name;
     this.status = "starting";
 
@@ -34,10 +32,10 @@ export default class Runner extends EventEmitter {
       },
     });
 
-    const child = spawn(this.command, { cwd: this.cwd });
+    const child = spawn(options.command, options.args, { cwd: options.cwd });
     this._child = child;
 
-    child.stdout.on("data", (data) => {
+    const handleOutput = (data) => {
       const status = getStatusFromOutput(data.toString(), options.statusObject);
 
       this.log.add(data.toString().trim());
@@ -46,11 +44,10 @@ export default class Runner extends EventEmitter {
         this.status = status;
         this.emit("status", status);
       }
-    });
+    };
 
-    child.stderr.on("data", (data) => {
-      console.error("stderr", data);
-    });
+    child.stdout.on("data", handleOutput);
+    child.stderr.on("data", handleOutput);
 
     child.on("close", (code) => {
       console.log(`child process exited with code ${code}`);

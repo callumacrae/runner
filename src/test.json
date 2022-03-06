@@ -1,4 +1,5 @@
 {
+  "tmuxRename": true,
   "runners": [
     {
       "name": "test",
