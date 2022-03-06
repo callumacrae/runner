@@ -3,9 +3,15 @@ import blessed from "blessed";
 import Runner from "./runner.mjs";
 import { statusToIcon } from "./status.mjs";
 
-export default class RunnerTable extends blessed.listtable {
+export default class RunnersInterface extends blessed.box {
   constructor() {
     super({
+      width: "100%",
+      height: "100%-1",
+    });
+
+    this.table = blessed.listtable({
+      parent: this,
       interactive: false, // this removes formatting unfortunately…
       tags: true,
       keys: true,
@@ -35,50 +41,66 @@ export default class RunnerTable extends blessed.listtable {
     this._runners = [];
     this.focusedRunner = undefined;
 
-    this.key("j", () => {
+    this.table.key("j", () => {
       if (this.selected < this._runners.length - 1) {
         this.selected++;
-        this._updateLog();
+        this._updateFocusedLog();
       }
     });
-    this.key("k", () => {
+    this.table.key("k", () => {
       if (this.selected > 0) {
         this.selected--;
-        this._updateLog();
+        this._updateFocusedLog();
       }
     });
 
     this.logContainer = blessed.box({
+      parent: this,
       width: "70%",
-      height: "100%-1",
+      height: "100%",
       left: "30%",
       top: 0,
     });
+
+    this.on("attach", () => {
+      this._setWidths();
+      this.screen.on("resize", () => this._setWidths());
+    });
+
+    this.on("focus", () => this.table.focus());
+    this.table.key("l", () => this.focusedRunner.log.focus());
   }
 
   addRunner(runner) {
     this._runners.push(runner);
-    this._renderRunnerTable();
-    this._updateLog();
+    this._renderRunnersInterface();
+    this._updateFocusedLog();
 
     this.logContainer.append(runner.log);
+    runner.log.key("h", () => this.table.focus());
 
-    runner.on("status", () => this._renderRunnerTable());
+    runner.on("status", () => this._renderRunnersInterface());
   }
 
   addRunnersArray(runners, options) {
     runners.forEach((runnerConfig) => {
-      const runner = new Runner({
-        cwd: options.cwd,
-        ...runnerConfig,
-      });
-
+      const runner = new Runner({ ...options, ...runnerConfig });
       this.addRunner(runner);
     });
   }
 
-  _renderRunnerTable() {
-    this.setData(
+  _setWidths() {
+    if (this.screen.width > 100) {
+      this.table.width = "30%";
+      this.logContainer.show();
+    } else {
+      this.table.width = "100%";
+      this.logContainer.hide();
+    }
+  }
+
+  _renderRunnersInterface() {
+    this.table.setData(
       [["#", "name", "status"]].concat(
         this._runners.map((runner, i) => [
           this.selected === i ? `{bold}${i}*{/bold}` : i.toString(),
@@ -90,7 +112,7 @@ export default class RunnerTable extends blessed.listtable {
     this.screen.render();
   }
 
-  _updateLog() {
+  _updateFocusedLog() {
     for (let i = 0; i < this._runners.length; i++) {
       const runner = this._runners[i];
       if (i === this.selected) {
